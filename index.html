@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BlueVault | Digital Study Library</title>
+
+    <meta
+        name="description"
+        content="BlueVault — shared digital class notes and educational PDF library."
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOADING SCREEN
+===================================================== -->
+
+<div id="loadingScreen" class="loading-screen">
+
+    <div class="loader-background"></div>
+
+    <div class="book-loader">
+
+        <div class="book-cover book-left">
+            <div class="book-logo">BV</div>
+        </div>
+
+        <div class="book-pages">
+            <div class="page-layer page-1"></div>
+            <div class="page-layer page-2"></div>
+            <div class="page-layer page-3"></div>
+        </div>
+
+        <div class="book-cover book-right">
+            <div class="book-line"></div>
+            <div class="book-line short"></div>
+        </div>
+
+    </div>
+
+    <div class="loading-text">
+
+        <div class="loading-brand">
+            BLUE<span>VAULT</span>
+        </div>
+
+        <p>
+            Opening your digital library...
+        </p>
+
+        <div class="loading-bar">
+            <div id="loadingProgress"></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <div class="header-inner">
+
+        <div
+            class="brand"
+            onclick="goHome()"
+        >
+
+            <div class="brand-mark">
+                BV
+            </div>
+
+            <div class="brand-text">
+
+                <strong>
+                    BLUEVAULT
+                </strong>
+
+                <span>
+                    DIGITAL LIBRARY
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <button onclick="goHome()">
+                Home
+            </button>
+
+            <button onclick="showSubjects()">
+                Subjects
+            </button>
+
+            <button onclick="openAddSubject()">
+                + Add Subject
+            </button>
+
+        </nav>
+
+
+        <div class="header-actions">
+
+            <button
+                id="soundToggle"
+                class="icon-button"
+                onclick="toggleSound()"
+                title="Toggle sounds"
+            >
+                🔊
+            </button>
+
+            <button
+                class="mobile-menu-btn"
+                onclick="toggleMobileMenu()"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="mobileMenu"
+        class="mobile-menu"
+    >
+
+        <button onclick="goHome(); toggleMobileMenu();">
+            Home
+        </button>
+
+        <button onclick="showSubjects(); toggleMobileMenu();">
+            Subjects
+        </button>
+
+        <button onclick="openAddSubject(); toggleMobileMenu();">
+            + Add Subject
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main>
+
+
+<!-- =====================================================
+     HOME PAGE
+===================================================== -->
+
+<section
+    id="homePage"
+    class="page active"
+>
+
+    <div class="hero">
+
+        <div class="hero-grid"></div>
+
+        <div class="hero-glow hero-glow-one"></div>
+        <div class="hero-glow hero-glow-two"></div>
+
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                <span class="pulse-dot"></span>
+                SHARED CLASS LIBRARY
+            </div>
+
+
+            <h1>
+                Your Notes.
+                <span>Your Group.</span>
+                One Library.
+            </h1>
+
+
+            <p>
+                Organize your class notes in one shared digital
+                library and access them from your computer or phone.
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <button
+                    class="primary-btn"
+                    onclick="showSubjects()"
+                >
+                    Explore Library
+                    <span>→</span>
+                </button>
+
+                <button
+                    class="secondary-btn"
+                    onclick="openAddSubject()"
+                >
+                    + Add Subject
+                </button>
+
+            </div>
+
+
+            <div class="hero-stats">
+
+                <div class="stat">
+
+                    <strong id="homeSubjectCount">
+                        12
+                    </strong>
+
+                    <span>
+                        Subjects
+                    </span>
+
+                </div>
+
+                <div class="stat">
+
+                    <strong>
+                        02
+                    </strong>
+
+                    <span>
+                        Languages
+                    </span>
+
+                </div>
+
+                <div class="stat">
+
+                    <strong>
+                        ∞
+                    </strong>
+
+                    <span>
+                        Resources
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+
+            <div class="floating-book">
+
+                <div class="book-glow"></div>
+
+                <div class="book-front">
+
+                    <span>
+                        DIGITAL
+                    </span>
+
+                    <strong>
+                        LIBRARY
+                    </strong>
+
+                    <small>
+                        BLUEVAULT
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="floating-chip chip-one">
+                PDF
+            </div>
+
+            <div class="floating-chip chip-three">
+                বাংলা
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="home-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    DISCOVER
+                </span>
+
+                <h2>
+                    Explore Subjects
+                </h2>
+
+                <p>
+                    Your most important study areas,
+                    organized beautifully.
+                </p>
+
+            </div>
+
+            <button
+                class="text-btn"
+                onclick="showSubjects()"
+            >
+                View all →
+            </button>
+
+        </div>
+
+
+        <div
+            id="homeSubjectGrid"
+            class="subject-grid"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SUBJECT PAGE
+===================================================== -->
+
+<section
+    id="subjectsPage"
+    class="page"
+>
+
+    <div class="page-header">
+
+        <div>
+
+            <span class="section-label">
+                KNOWLEDGE COLLECTION
+            </span>
+
+            <h1>
+                Subjects
+            </h1>
+
+            <p>
+                Choose a subject to explore its language
+                versions and educational resources.
+            </p>
+
+        </div>
+
+
+        <div class="big-number">
+
+            <span id="subjectNumber">
+                12
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="subject-toolbar">
+
+        <div class="search-box">
+
+            <span>
+                ⌕
+            </span>
+
+            <input
+                id="subjectSearch"
+                type="text"
+                placeholder="Search subjects..."
+                oninput="searchSubjects()"
+            >
+
+        </div>
+
+
+        <button
+            class="add-subject-button"
+            onclick="openAddSubject()"
+        >
+            <span>+</span>
+            Add Subject
+        </button>
+
+    </div>
+
+
+    <div
+        id="subjectGrid"
+        class="subject-grid large-grid"
+    ></div>
+
+</section>
+
+
+<!-- =====================================================
+     LANGUAGE PAGE
+===================================================== -->
+
+<section
+    id="languagePage"
+    class="page"
+>
+
+    <button
+        class="back-btn"
+        onclick="showSubjects()"
+    >
+        ← Back to Subjects
+    </button>
+
+
+    <div class="page-header compact">
+
+        <div>
+
+            <span class="section-label">
+                LANGUAGE COLLECTION
+            </span>
+
+            <h1 id="languagePageTitle">
+                Choose a Language
+            </h1>
+
+            <p>
+                Select the language version of the subject
+                you want to explore.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="language-grid">
+
+
+        <!-- BENGALI -->
+
+        <div
+            class="language-card bengali"
+            onclick="openPDFLibrary('bengali')"
+        >
+
+            <div class="language-particles"></div>
+
+            <span class="language-number">
+                01
+            </span>
+
+            <div class="language-icon bengali-icon">
+                অ
+            </div>
+
+            <div class="language-content">
+
+                <span>
+                    বাংলা
+                </span>
+
+                <h2>
+                    Bengali Version
+                </h2>
+
+                <p>
+                    বাংলা ভাষায় বই, নোট এবং PDF সংগ্রহ।
+                </p>
+
+            </div>
+
+            <div class="language-arrow">
+                →
+            </div>
+
+        </div>
+
+
+        <!-- ENGLISH -->
+
+        <div
+            class="language-card english"
+            onclick="openPDFLibrary('english')"
+        >
+
+            <div class="language-particles"></div>
+
+            <span class="language-number">
+                02
+            </span>
+
+            <div class="language-icon">
+                A
+            </div>
+
+            <div class="language-content">
+
+                <span>
+                    ENGLISH
+                </span>
+
+                <h2>
+                    English Version
+                </h2>
+
+                <p>
+                    Books, notes and educational PDFs in English.
+                </p>
+
+            </div>
+
+            <div class="language-arrow">
+                →
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PDF PAGE
+===================================================== -->
+
+<section
+    id="pdfPage"
+    class="page"
+>
+
+    <button
+        class="back-btn"
+        onclick="backToLanguagePage()"
+    >
+        ← Back to Languages
+    </button>
+
+
+    <div class="pdf-header">
+
+        <div>
+
+            <span class="section-label">
+                SHARED DIGITAL ARCHIVE
+            </span>
+
+            <h1 id="pdfPageTitle">
+                PDF Library
+            </h1>
+
+            <p id="pdfPageDescription">
+                Your shared class notes.
+            </p>
+
+        </div>
+
+
+        <div class="pdf-badge">
+            PDF
+        </div>
+
+    </div>
+
+
+    <div class="library-toolbar">
+
+        <div class="search-box">
+
+            <span>
+                ⌕
+            </span>
+
+            <input
+                type="text"
+                id="pdfSearch"
+                placeholder="Search PDFs..."
+                oninput="searchPDFs()"
+            >
+
+        </div>
+
+
+        <div
+            id="pdfCount"
+            class="pdf-count"
+        >
+            0 PDFs
+        </div>
+
+    </div>
+
+
+    <!-- PDF UPLOAD -->
+
+    <div class="upload-section">
+
+        <input
+            type="file"
+            id="pdfInput"
+            accept=".pdf,application/pdf"
+            onchange="handlePDFUpload(event)"
+            hidden
+        >
+
+        <label
+            for="pdfInput"
+            class="upload-box"
+        >
+
+            <div class="upload-icon">
+                ↑
+            </div>
+
+            <div>
+
+                <strong>
+                    Add a PDF
+                </strong>
+
+                <p>
+                    Upload a class note to the shared library
+                </p>
+
+            </div>
+
+            <span class="upload-plus">
+                +
+            </span>
+
+        </label>
+
+    </div>
+
+
+    <div
+        id="pdfList"
+        class="pdf-list"
+    ></div>
+
+</section>
+
+</main>
+
+
+<!-- =====================================================
+     ADD SUBJECT MODAL
+===================================================== -->
+
+<div
+    id="subjectModal"
+    class="modal"
+    onclick="closeSubjectModal(event)"
+>
+
+    <div
+        class="modal-card subject-modal"
+        onclick="event.stopPropagation()"
+    >
+
+        <button
+            class="modal-close"
+            onclick="closeSubjectModal()"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-heading">
+
+            <span class="section-label">
+                CUSTOMIZE LIBRARY
+            </span>
+
+            <h2>
+                Add New Subject
+            </h2>
+
+            <p>
+                Create your own subject in Bengali and English.
+            </p>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                English Subject Name
+            </label>
+
+            <input
+                id="subjectEnglish"
+                type="text"
+                placeholder="Example: Computer Science"
+                maxlength="50"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Bengali Subject Name
+            </label>
+
+            <input
+                id="subjectBengali"
+                type="text"
+                placeholder="উদাহরণ: কম্পিউটার বিজ্ঞান"
+                maxlength="50"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Choose Icon
+            </label>
+
+            <div class="icon-selector">
+
+                <button onclick="selectSubjectIcon('📘')">
+                    📘
+                </button>
+
+                <button onclick="selectSubjectIcon('💻')">
+                    💻
+                </button>
+
+                <button onclick="selectSubjectIcon('🔬')">
+                    🔬
+                </button>
+
+                <button onclick="selectSubjectIcon('📐')">
+                    📐
+                </button>
+
+                <button onclick="selectSubjectIcon('🎨')">
+                    🎨
+                </button>
+
+                <button onclick="selectSubjectIcon('🌐')">
+                    🌐
+                </button>
+
+                <button onclick="selectSubjectIcon('📖')">
+                    📖
+                </button>
+
+                <button onclick="selectSubjectIcon('⭐')">
+                    ⭐
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="modal-primary-btn"
+            onclick="addSubject()"
+        >
+            Create Subject →
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+>
+
+    <span id="toastMessage">
+        Done
+    </span>
+
+</div>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <div class="footer-inner">
+
+        <div class="footer-brand">
+
+            <div class="brand-mark">
+                BV
+            </div>
+
+            <div>
+
+                <strong>
+                    BLUEVAULT
+                </strong>
+
+                <span>
+                    DIGITAL EDUCATION
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-center">
+            Learn. Organize. Discover.
+        </div>
+
+
+        <span class="footer-copy">
+            © 2026 BlueVault
+        </span>
+
+    </div>
+
+</footer>
+
+
+<!-- =====================================================
+     SUPABASE
+===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- BLUEVAULT JAVASCRIPT -->
+
+<script src="script.js"></script>
+
+</body>
+</html>

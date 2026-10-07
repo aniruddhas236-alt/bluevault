@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>StudyVault — Digital PDF Library</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     INITIAL LOADING SCREEN
+===================================================== -->
+
+<div id="loader" class="loader">
+
+    <div class="loader-scene">
+
+        <div class="loader-glow"></div>
+
+        <div class="loader-book">
+
+            <div class="loader-cover loader-cover-left"></div>
+
+            <div class="loader-cover loader-cover-right"></div>
+
+            <div class="loader-page page-1"></div>
+            <div class="loader-page page-2"></div>
+            <div class="loader-page page-3"></div>
+            <div class="loader-page page-4"></div>
+
+            <div class="loader-spine"></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="loader-brand">
+        STUDY<span>VAULT</span>
+    </div>
+
+    <div class="loader-subtitle">
+        DIGITAL KNOWLEDGE ARCHIVE
+    </div>
+
+    <div class="loader-progress">
+
+        <div
+            id="loaderProgressBar"
+            class="loader-progress-bar"
+        ></div>
+
+    </div>
+
+    <div
+        id="loaderStatus"
+        class="loader-status"
+    >
+        OPENING ARCHIVE
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PAGE TRANSITION
+===================================================== -->
+
+<div
+    id="pageTransition"
+    class="page-transition"
+>
+
+    <div class="transition-book">
+
+        <div class="transition-page transition-page-1"></div>
+        <div class="transition-page transition-page-2"></div>
+        <div class="transition-page transition-page-3"></div>
+
+        <div class="transition-spine"></div>
+
+    </div>
+
+</div>
+
+
+
+<!-- BACKGROUND -->
+<div class="background-glow glow-one"></div>
+<div class="background-glow glow-two"></div>
+
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="site-header">
+
+
+    <div
+        class="brand"
+        onclick="goHome()"
+    >
+
+        <div class="brand-mark">
+            SV
+        </div>
+
+        <div>
+
+            <div class="brand-name">
+                StudyVault
+            </div>
+
+            <div class="brand-subtitle">
+                DIGITAL PDF LIBRARY
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <nav class="desktop-nav">
+
+        <button onclick="goHome()">
+            Home
+        </button>
+
+        <button onclick="showSubjects()">
+            Subjects
+        </button>
+
+    </nav>
+
+
+
+    <div class="header-actions">
+
+        <button
+            id="soundButton"
+            class="icon-button"
+            onclick="toggleSound()"
+            title="Sound"
+        >
+            🔊
+        </button>
+
+
+        <button
+            class="primary-button small-button"
+            onclick="openAddSubjectModal()"
+        >
+
+            <span>+</span>
+
+            <b>Add Subject</b>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main-content">
+
+
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<section
+    id="homeSection"
+    class="page-section active"
+>
+
+
+    <div class="hero">
+
+
+        <div class="hero-content">
+
+
+            <div class="eyebrow">
+
+                <span></span>
+
+                YOUR DIGITAL LIBRARY
+
+            </div>
+
+
+            <h1>
+
+                Every page.
+                <br>
+
+                <em>One vault.</em>
+
+            </h1>
+
+
+            <p class="hero-description">
+
+                A beautifully organized home
+                for your study PDFs.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <button
+                    class="primary-button"
+                    onclick="showSubjects()"
+                >
+
+                    Explore Library
+
+                    <span>→</span>
+
+                </button>
+
+
+                <button
+                    class="secondary-button"
+                    onclick="openAddSubjectModal()"
+                >
+
+                    + Add Subject
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hero-visual">
+
+
+            <div class="floating-card card-back"></div>
+
+            <div class="floating-card card-middle"></div>
+
+
+            <div class="book-card">
+
+
+                <div class="book-top">
+
+                    <span>SV</span>
+
+                    <span>01</span>
+
+                </div>
+
+
+                <div class="book-center">
+
+                    <div class="book-symbol">
+                        ✦
+                    </div>
+
+
+                    <div class="book-title">
+
+                        STUDY
+                        <br>
+                        VAULT
+
+                    </div>
+
+
+                    <div class="book-caption">
+
+                        KNOWLEDGE
+                        <br>
+                        ARCHIVE
+
+                    </div>
+
+                </div>
+
+
+                <div class="book-bottom">
+
+                    <span>EST. 2026</span>
+
+                    <span>LIBRARY</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stats-grid">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ◈
+            </div>
+
+            <div>
+
+                <div
+                    id="homeSubjectCount"
+                    class="stat-number"
+                >
+                    0
+                </div>
+
+                <div class="stat-label">
+                    SUBJECTS
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ▣
+            </div>
+
+            <div>
+
+                <div
+                    id="homePDFCount"
+                    class="stat-number"
+                >
+                    0
+                </div>
+
+                <div class="stat-label">
+                    PDF FILES
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ◫
+            </div>
+
+            <div>
+
+                <div class="stat-number">
+                    8
+                </div>
+
+                <div class="stat-label">
+                    CLASSES
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ◎
+            </div>
+
+            <div>
+
+                <div class="stat-number">
+                    3
+                </div>
+
+                <div class="stat-label">
+                    MEDIUMS
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     SUBJECTS
+===================================================== -->
+
+<section
+    id="subjectsSection"
+    class="page-section"
+>
+
+
+    <div class="page-heading">
+
+
+        <div>
+
+            <div class="eyebrow">
+
+                <span></span>
+
+                LIBRARY
+
+            </div>
+
+
+            <h2>
+                Subjects
+            </h2>
+
+
+            <p class="page-subtitle">
+                Your complete subject collection.
+            </p>
+
+        </div>
+
+
+        <button
+            class="primary-button"
+            onclick="openAddSubjectModal()"
+        >
+
+            + Add Subject
+
+        </button>
+
+    </div>
+
+
+
+    <div class="search-wrapper">
+
+        <span class="search-icon">
+            ⌕
+        </span>
+
+
+        <input
+            id="subjectSearch"
+            type="text"
+            placeholder="Search subjects..."
+            oninput="searchSubjects()"
+        >
+
+
+        <span class="search-shortcut">
+            CTRL K
+        </span>
+
+    </div>
+
+
+
+    <div
+        id="subjectsGrid"
+        class="subjects-grid"
+    ></div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CLASSES
+===================================================== -->
+
+<section
+    id="classesSection"
+    class="page-section"
+>
+
+
+    <button
+        class="back-button"
+        onclick="showSubjects()"
+    >
+        ← Subjects
+    </button>
+
+
+    <div class="page-heading">
+
+        <div>
+
+            <div class="eyebrow">
+
+                <span></span>
+
+                <span id="selectedSubjectLabel">
+                    SUBJECT
+                </span>
+
+            </div>
+
+
+            <h2>
+                Choose Class
+            </h2>
+
+
+            <p class="page-subtitle">
+                Select a class.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="classesGrid"
+        class="classes-grid"
+    ></div>
+
+</section>
+
+
+
+<!-- =====================================================
+     MEDIUM
+===================================================== -->
+
+<section
+    id="mediumSection"
+    class="page-section"
+>
+
+
+    <button
+        class="back-button"
+        onclick="showClasses()"
+    >
+        ← Classes
+    </button>
+
+
+    <div class="page-heading">
+
+        <div>
+
+            <div class="eyebrow">
+
+                <span></span>
+
+                <span id="selectedClassLabel">
+                    CLASS
+                </span>
+
+            </div>
+
+
+            <h2>
+                Choose Medium
+            </h2>
+
+
+            <p class="page-subtitle">
+                Select your language.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="mediumGrid"
+        class="medium-grid"
+    ></div>
+
+</section>
+
+
+
+<!-- =====================================================
+     PDF LIBRARY
+===================================================== -->
+
+<section
+    id="pdfSection"
+    class="page-section"
+>
+
+
+    <button
+        class="back-button"
+        onclick="showLanguages()"
+    >
+        ← Medium
+    </button>
+
+
+    <div class="page-heading">
+
+        <div>
+
+            <div class="eyebrow">
+
+                <span></span>
+
+                <span id="pdfBreadcrumb">
+                    LIBRARY
+                </span>
+
+            </div>
+
+
+            <h2 id="pdfPageTitle">
+                PDF Library
+            </h2>
+
+
+            <p
+                id="pdfPageSubtitle"
+                class="page-subtitle"
+            >
+                Your study materials.
+            </p>
+
+        </div>
+
+
+        <button
+            class="primary-button"
+            onclick="openAddPdfModal()"
+        >
+
+            + Add PDF
+
+        </button>
+
+    </div>
+
+
+    <div
+        id="pdfGrid"
+        class="pdf-grid"
+    ></div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="site-footer">
+
+    <div>
+
+        <strong>
+            STUDYVAULT
+        </strong>
+
+        <span>
+            Digital PDF Library
+        </span>
+
+    </div>
+
+
+    <div>
+        © 2026 StudyVault
+    </div>
+
+</footer>
+
+
+
+<!-- =====================================================
+     ADD SUBJECT MODAL
+===================================================== -->
+
+<div
+    id="addSubjectModal"
+    class="modal-overlay"
+    onclick="closeModalOutside(event,'addSubjectModal')"
+>
+
+    <div class="modal">
+
+
+        <button
+            class="modal-close"
+            onclick="closeModal('addSubjectModal')"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-symbol">
+            ＋
+        </div>
+
+
+        <div class="modal-eyebrow">
+            NEW COLLECTION
+        </div>
+
+
+        <h3>
+            Add Subject
+        </h3>
+
+
+        <p class="modal-description">
+            Create a new subject.
+        </p>
+
+
+        <label>
+            Subject name
+        </label>
+
+
+        <input
+            id="subjectNameInput"
+            type="text"
+            maxlength="40"
+            placeholder="e.g. Mathematics"
+        >
+
+
+        <label>
+            Icon
+        </label>
+
+
+        <input
+            id="subjectIconInput"
+            type="text"
+            maxlength="3"
+            placeholder="∑"
+        >
+
+
+        <div class="modal-actions">
+
+
+            <button
+                class="secondary-button"
+                onclick="closeModal('addSubjectModal')"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                class="primary-button"
+                onclick="addSubject()"
+            >
+                Add Subject
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     REMOVE SUBJECT MODAL
+===================================================== -->
+
+<div
+    id="removeSubjectModal"
+    class="modal-overlay"
+    onclick="closeModalOutside(event,'removeSubjectModal')"
+>
+
+    <div class="modal danger-modal">
+
+
+        <button
+            class="modal-close"
+            onclick="closeModal('removeSubjectModal')"
+        >
+            ×
+        </button>
+
+
+        <div class="danger-symbol">
+            !
+        </div>
+
+
+        <div class="modal-eyebrow">
+            REMOVE SUBJECT
+        </div>
+
+
+        <h3 id="removeSubjectTitle">
+            Remove Subject?
+        </h3>
+
+
+        <p class="modal-description">
+            All PDFs inside this subject will also be removed.
+        </p>
+
+
+        <div class="modal-actions">
+
+
+            <button
+                class="secondary-button"
+                onclick="closeModal('removeSubjectModal')"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                class="danger-button"
+                onclick="confirmRemoveSubject()"
+            >
+                Remove
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     ADD PDF MODAL
+===================================================== -->
+
+<div
+    id="addPdfModal"
+    class="modal-overlay"
+    onclick="closeModalOutside(event,'addPdfModal')"
+>
+
+    <div class="modal wide-modal">
+
+
+        <button
+            class="modal-close"
+            onclick="closeModal('addPdfModal')"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-symbol">
+            ▣
+        </div>
+
+
+        <div class="modal-eyebrow">
+            PDF ARCHIVE
+        </div>
+
+
+        <h3>
+            Add PDF
+        </h3>
+
+
+        <p class="modal-description">
+            Add a document to the current collection.
+        </p>
+
+
+        <label>
+            PDF title
+        </label>
+
+
+        <input
+            id="pdfTitleInput"
+            type="text"
+            maxlength="100"
+            placeholder="e.g. Chapter 1 Notes"
+        >
+
+
+        <label>
+            PDF file
+        </label>
+
+
+        <div class="file-upload">
+
+
+            <input
+                id="pdfFileInput"
+                type="file"
+                accept=".pdf,application/pdf"
+                onchange="updateFileName()"
+            >
+
+
+            <div class="file-upload-content">
+
+
+                <div class="file-upload-icon">
+                    ↑
+                </div>
+
+
+                <div>
+
+                    <strong id="fileNameDisplay">
+                        Choose PDF file
+                    </strong>
+
+                    <span>
+                        PDF document
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="uploadProgressArea"
+            class="upload-progress-area"
+        >
+
+            <div class="upload-progress-top">
+
+                <span>
+                    Saving PDF
+                </span>
+
+                <span id="uploadProgressText">
+                    0%
+                </span>
+
+            </div>
+
+            <div class="upload-progress">
+
+                <div
+                    id="uploadProgressBar"
+                    class="upload-progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+
+            <button
+                class="secondary-button"
+                onclick="closeModal('addPdfModal')"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                id="addPdfButton"
+                class="primary-button"
+                onclick="addPDF()"
+            >
+                Add PDF
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     QR MODAL
+===================================================== -->
+
+<div
+    id="qrModal"
+    class="modal-overlay"
+    onclick="closeModalOutside(event,'qrModal')"
+>
+
+    <div class="modal qr-modal">
+
+
+        <button
+            class="modal-close"
+            onclick="closeModal('qrModal')"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-eyebrow">
+            QUICK ACCESS
+        </div>
+
+
+        <h3 id="qrTitle">
+            PDF QR Code
+        </h3>
+
+
+        <div
+            id="qrcode"
+            class="qr-container"
+        ></div>
+
+
+        <p
+            id="qrUrl"
+            class="qr-url"
+        >
+            —
+        </p>
+
+
+        <div class="modal-actions">
+
+
+            <button
+                class="secondary-button"
+                onclick="copyQRLink()"
+            >
+                Copy Link
+            </button>
+
+
+            <button
+                class="primary-button"
+                onclick="closeModal('qrModal')"
+            >
+                Done
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+>
+
+    <div
+        id="toastIcon"
+        class="toast-icon"
+    >
+        ✓
+    </div>
+
+
+    <div>
+
+        <strong id="toastTitle">
+            Success
+        </strong>
+
+        <span id="toastMessage">
+            Done.
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

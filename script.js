@@ -1,7 +1,7 @@
 /* =========================================================
    BLUEVAULT
-   DIGITAL STUDY LIBRARY
-   SUPABASE + MOBILE BACK SYSTEM
+   SHARED CLASS NOTES LIBRARY
+   SUPABASE CLOUD VERSION
 ========================================================= */
 
 
@@ -17,9 +17,6 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 const SUPABASE_BUCKET =
     "bluevault-pdfs";
-
-const MAX_PDF_SIZE =
-    500 * 1024 * 1024;
 
 let supabaseClient = null;
 
@@ -46,6 +43,14 @@ try {
     );
 
 }
+
+
+/* =========================================================
+   LIMITS
+========================================================= */
+
+const MAX_PDF_SIZE =
+    500 * 1024 * 1024;
 
 
 /* =========================================================
@@ -166,7 +171,7 @@ const defaultSubjects = [
 
 
 /* =========================================================
-   APPLICATION STATE
+   STATE
 ========================================================= */
 
 let subjects = [];
@@ -187,50 +192,31 @@ let audioContext = null;
 
 
 /* =========================================================
-   LOAD SUBJECTS FROM LOCAL STORAGE
+   LOAD SUBJECTS
 ========================================================= */
 
 try {
 
-    const savedSubjects =
+    const saved =
         JSON.parse(
             localStorage.getItem(
                 "blueVaultSubjects"
             )
         );
 
-    if (
-        Array.isArray(savedSubjects) &&
-        savedSubjects.length > 0
-    ) {
-
-        subjects = savedSubjects;
-
-    } else {
-
-        subjects = [
-            ...defaultSubjects
-        ];
-
-    }
+    subjects =
+        Array.isArray(saved) &&
+        saved.length
+            ? saved
+            : [...defaultSubjects];
 
 } catch (error) {
 
-    console.warn(
-        "Could not load saved subjects.",
-        error
-    );
-
-    subjects = [
-        ...defaultSubjects
-    ];
+    subjects =
+        [...defaultSubjects];
 
 }
 
-
-/* =========================================================
-   SAVE SUBJECTS
-========================================================= */
 
 function saveSubjects() {
 
@@ -265,13 +251,9 @@ document.addEventListener(
 
         updateSubjectCounters();
 
-        setupKeyboardShortcuts();
-
         startLoadingScreen();
 
-        updateMobileBackButton(
-            "homePage"
-        );
+        setupKeyboardShortcuts();
 
         if (!supabaseClient) {
 
@@ -367,38 +349,83 @@ function createSubjectCards() {
             "subjectGrid"
         );
 
-
     const term =
         searchTerm
             .toLowerCase()
             .trim();
-
 
     const filtered =
         subjects.filter(
             function (subject) {
 
                 return (
-
                     subject.english
                         .toLowerCase()
                         .includes(term)
-
                     ||
-
                     subject.bengali
                         .toLowerCase()
                         .includes(term)
-
                 );
 
             }
         );
 
 
-    /* -----------------------------------------------------
-       HOME SUBJECTS
-    ----------------------------------------------------- */
+    const cards =
+        filtered
+            .map(
+                function (subject, index) {
+
+                    return `
+
+<div
+    class="subject-card"
+    onclick="openLanguagePage('${escapeAttribute(subject.id)}')"
+>
+
+    <span class="subject-number">
+        ${String(index + 1).padStart(2, "0")}
+    </span>
+
+    <div class="subject-icon">
+        ${escapeHTML(subject.icon)}
+    </div>
+
+    <h3>
+        ${escapeHTML(subject.english)}
+    </h3>
+
+    <p>
+        ${escapeHTML(subject.short)}
+    </p>
+
+    <span class="subject-language">
+        ${escapeHTML(subject.bengali)}
+    </span>
+
+    ${
+        subject.custom
+            ? `
+<button
+    class="subject-delete"
+    onclick="event.stopPropagation(); removeSubject('${escapeAttribute(subject.id)}')"
+    title="Remove subject"
+>
+    ×
+</button>
+`
+            : ""
+    }
+
+</div>
+
+`;
+
+                }
+            )
+            .join("");
+
 
     if (homeGrid) {
 
@@ -406,41 +433,38 @@ function createSubjectCards() {
             subjects
                 .slice(0, 5)
                 .map(
-                    function (
-                        subject,
-                        index
-                    ) {
+                    function (subject, index) {
 
                         return `
 
-                            <div
-                                class="subject-card"
-                                onclick="openLanguagePage('${escapeAttribute(subject.id)}')"
-                            >
+<div
+    class="subject-card"
+    onclick="openLanguagePage('${escapeAttribute(subject.id)}')"
+>
 
-                                <span class="subject-number">
-                                    ${String(index + 1).padStart(2, "0")}
-                                </span>
+    <span class="subject-number">
+        ${String(index + 1).padStart(2, "0")}
+    </span>
 
-                                <div class="subject-icon">
-                                    ${escapeHTML(subject.icon)}
-                                </div>
+    <div class="subject-icon">
+        ${escapeHTML(subject.icon)}
+    </div>
 
-                                <h3>
-                                    ${escapeHTML(subject.english)}
-                                </h3>
+    <h3>
+        ${escapeHTML(subject.english)}
+    </h3>
 
-                                <p>
-                                    ${escapeHTML(subject.short)}
-                                </p>
+    <p>
+        ${escapeHTML(subject.short)}
+    </p>
 
-                                <span class="subject-language">
-                                    ${escapeHTML(subject.bengali)}
-                                </span>
+    <span class="subject-language">
+        ${escapeHTML(subject.bengali)}
+    </span>
 
-                            </div>
+</div>
 
-                        `;
+`;
 
                     }
                 )
@@ -449,100 +473,29 @@ function createSubjectCards() {
     }
 
 
-    /* -----------------------------------------------------
-       SUBJECT PAGE
-    ----------------------------------------------------- */
-
     if (subjectGrid) {
 
-        if (!filtered.length) {
-
-            subjectGrid.innerHTML = `
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ⌕
-                    </div>
-
-                    <h3>
-                        No subjects found
-                    </h3>
-
-                    <p>
-                        Try another search.
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-
-        }
-
-
         subjectGrid.innerHTML =
-            filtered
-                .map(
-                    function (
-                        subject,
-                        index
-                    ) {
+            cards ||
+            `
 
-                        return `
+<div class="empty-state">
 
-                            <div
-                                class="subject-card"
-                                onclick="openLanguagePage('${escapeAttribute(subject.id)}')"
-                            >
+    <div class="empty-icon">
+        ⌕
+    </div>
 
-                                <span class="subject-number">
-                                    ${String(index + 1).padStart(2, "0")}
-                                </span>
+    <h3>
+        No subjects found
+    </h3>
 
-                                <div class="subject-icon">
-                                    ${escapeHTML(subject.icon)}
-                                </div>
+    <p>
+        Try another search.
+    </p>
 
-                                <h3>
-                                    ${escapeHTML(subject.english)}
-                                </h3>
+</div>
 
-                                <p>
-                                    ${escapeHTML(subject.short)}
-                                </p>
-
-                                <span class="subject-language">
-                                    ${escapeHTML(subject.bengali)}
-                                </span>
-
-                                ${
-                                    subject.custom
-                                        ? `
-
-                                            <button
-                                                class="subject-delete"
-                                                onclick="
-                                                    event.stopPropagation();
-                                                    removeSubject('${escapeAttribute(subject.id)}');
-                                                "
-                                                title="Remove subject"
-                                            >
-                                                ×
-                                            </button>
-
-                                        `
-                                        : ""
-                                }
-
-                            </div>
-
-                        `;
-
-                    }
-                )
-                .join("");
+`;
 
     }
 
@@ -568,14 +521,12 @@ function updateSubjectCounters() {
             "subjectNumber"
         );
 
-
     if (home) {
 
         home.textContent =
             count;
 
     }
-
 
     if (number) {
 
@@ -591,119 +542,13 @@ function updateSubjectCounters() {
 
 
 /* =========================================================
-   MOBILE BACK BUTTON
-========================================================= */
-
-function updateMobileBackButton(
-    pageId
-) {
-
-    const button =
-        document.getElementById(
-            "mobileBackButton"
-        );
-
-    if (!button) {
-        return;
-    }
-
-
-    const label =
-        button.querySelector(
-            "span:last-child"
-        );
-
-
-    const backTargets = {
-
-        subjectsPage:
-            "homePage",
-
-        languagePage:
-            "subjectsPage",
-
-        pdfPage:
-            "languagePage"
-
-    };
-
-
-    const shouldShow =
-        Object.prototype.hasOwnProperty.call(
-            backTargets,
-            pageId
-        );
-
-
-    button.classList.toggle(
-        "show",
-        shouldShow
-    );
-
-
-    if (pageId === "subjectsPage") {
-
-        button.setAttribute(
-            "aria-label",
-            "Back to Home"
-        );
-
-        if (label) {
-            label.textContent =
-                "Home";
-        }
-
-    }
-
-
-    else if (
-        pageId === "languagePage"
-    ) {
-
-        button.setAttribute(
-            "aria-label",
-            "Back to Subjects"
-        );
-
-        if (label) {
-            label.textContent =
-                "Subjects";
-        }
-
-    }
-
-
-    else if (
-        pageId === "pdfPage"
-    ) {
-
-        button.setAttribute(
-            "aria-label",
-            "Back to Languages"
-        );
-
-        if (label) {
-            label.textContent =
-                "Languages";
-        }
-
-    }
-
-}
-
-
-/* =========================================================
    PAGE NAVIGATION
 ========================================================= */
 
-function showPage(
-    pageId
-) {
+function showPage(pageId) {
 
     document
-        .querySelectorAll(
-            ".page"
-        )
+        .querySelectorAll(".page")
         .forEach(
             function (page) {
 
@@ -720,7 +565,6 @@ function showPage(
             pageId
         );
 
-
     if (!page) {
         return;
     }
@@ -731,86 +575,18 @@ function showPage(
     );
 
 
-    updateMobileBackButton(
-        pageId
-    );
-
-
     playSound(
         "page"
     );
 
 
-    window.scrollTo(
-        {
-            top: 0,
-            behavior: "smooth"
-        }
-    );
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 
 }
 
-
-/* =========================================================
-   MOBILE BACK ACTION
-========================================================= */
-
-function mobileGoBack() {
-
-    const activePage =
-        document.querySelector(
-            ".page.active"
-        );
-
-
-    if (!activePage) {
-
-        goHome();
-
-        return;
-
-    }
-
-
-    switch (
-        activePage.id
-    ) {
-
-        case "subjectsPage":
-
-            goHome();
-
-            break;
-
-
-        case "languagePage":
-
-            showSubjects();
-
-            break;
-
-
-        case "pdfPage":
-
-            backToLanguagePage();
-
-            break;
-
-
-        default:
-
-            goHome();
-
-            break;
-
-    }
-
-}
-
-
-/* =========================================================
-   HOME
-========================================================= */
 
 function goHome() {
 
@@ -821,10 +597,6 @@ function goHome() {
 }
 
 
-/* =========================================================
-   SUBJECTS
-========================================================= */
-
 function showSubjects() {
 
     searchTerm = "";
@@ -834,13 +606,9 @@ function showSubjects() {
             "subjectSearch"
         );
 
-
     if (input) {
-
         input.value = "";
-
     }
-
 
     createSubjectCards();
 
@@ -851,10 +619,6 @@ function showSubjects() {
 }
 
 
-/* =========================================================
-   SUBJECT SEARCH
-========================================================= */
-
 function searchSubjects() {
 
     const input =
@@ -862,12 +626,10 @@ function searchSubjects() {
             "subjectSearch"
         );
 
-
     searchTerm =
         input
             ? input.value.trim()
             : "";
-
 
     createSubjectCards();
 
@@ -875,7 +637,7 @@ function searchSubjects() {
 
 
 /* =========================================================
-   OPEN LANGUAGE PAGE
+   LANGUAGE PAGE
 ========================================================= */
 
 function openLanguagePage(
@@ -885,27 +647,21 @@ function openLanguagePage(
     const subject =
         subjects.find(
             function (item) {
-
                 return item.id === subjectId;
-
             }
         );
-
 
     if (!subject) {
         return;
     }
 
-
     currentSubject =
         subjectId;
-
 
     const title =
         document.getElementById(
             "languagePageTitle"
         );
-
 
     if (title) {
 
@@ -914,11 +670,9 @@ function openLanguagePage(
 
     }
 
-
     playSound(
         "language"
     );
-
 
     showPage(
         "languagePage"
@@ -927,24 +681,14 @@ function openLanguagePage(
 }
 
 
-/* =========================================================
-   BACK TO LANGUAGE PAGE
-========================================================= */
-
 function backToLanguagePage() {
 
     const subject =
         subjects.find(
             function (item) {
-
-                return (
-                    item.id ===
-                    currentSubject
-                );
-
+                return item.id === currentSubject;
             }
         );
-
 
     if (!subject) {
 
@@ -954,12 +698,10 @@ function backToLanguagePage() {
 
     }
 
-
     const title =
         document.getElementById(
             "languagePageTitle"
         );
-
 
     if (title) {
 
@@ -967,7 +709,6 @@ function backToLanguagePage() {
             subject.english;
 
     }
-
 
     showPage(
         "languagePage"
@@ -985,30 +726,18 @@ function openPDFLibrary(
 ) {
 
     if (!currentSubject) {
-
-        showSubjects();
-
         return;
-
     }
-
 
     currentLanguage =
         language;
 
-
     const subject =
         subjects.find(
             function (item) {
-
-                return (
-                    item.id ===
-                    currentSubject
-                );
-
+                return item.id === currentSubject;
             }
         );
-
 
     if (!subject) {
         return;
@@ -1026,12 +755,10 @@ function openPDFLibrary(
             "pdfPageTitle"
         );
 
-
     const description =
         document.getElementById(
             "pdfPageDescription"
         );
-
 
     const search =
         document.getElementById(
@@ -1049,20 +776,10 @@ function openPDFLibrary(
 
     if (description) {
 
-        if (
-            language ===
-            "bengali"
-        ) {
-
-            description.textContent =
-                `বাংলা ভাষায় ${subject.english}-এর shared class notes.`;
-
-        } else {
-
-            description.textContent =
-                `${subject.english} shared class notes and PDF resources.`;
-
-        }
+        description.textContent =
+            language === "bengali"
+                ? `বাংলা ভাষায় ${subject.english}-এর shared class notes.`
+                : `${subject.english} shared class notes and PDF resources.`;
 
     }
 
@@ -1076,14 +793,11 @@ function openPDFLibrary(
 
     searchTerm = "";
 
-
     showPage(
         "pdfPage"
     );
 
-
     renderPDFs();
-
 
     playSound(
         language === "bengali"
@@ -1095,7 +809,29 @@ function openPDFLibrary(
 
 
 /* =========================================================
-   SUPABASE PATH HELPERS
+   SUPABASE CHECK
+========================================================= */
+
+function requireSupabase() {
+
+    if (!supabaseClient) {
+
+        alert(
+            "BlueVault could not connect to Supabase.\n\n" +
+            "Check your internet connection and Supabase configuration."
+        );
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+/* =========================================================
+   SAFE PATH HELPERS
 ========================================================= */
 
 function safePathPart(
@@ -1114,7 +850,8 @@ function safePathPart(
         .replace(
             /^-+|-+$/g,
             ""
-        ) || "unknown";
+        )
+        || "unknown";
 
 }
 
@@ -1138,7 +875,8 @@ function safeFileName(
         .slice(
             0,
             180
-        ) || "document.pdf";
+        )
+        || "document.pdf";
 
 }
 
@@ -1148,11 +886,14 @@ function getLibraryPrefix() {
     return (
         safePathPart(
             currentSubject
-        ) +
-        "/" +
+        )
+        +
+        "/"
+        +
         safePathPart(
             currentLanguage
-        ) +
+        )
+        +
         "/"
     );
 
@@ -1163,58 +904,23 @@ function makeStoragePath(
     fileName
 ) {
 
-    let id;
-
-
-    if (
+    const id =
         typeof crypto !== "undefined" &&
-        typeof crypto.randomUUID ===
-            "function"
-    ) {
-
-        id =
-            crypto.randomUUID();
-
-    } else {
-
-        id =
-            Date.now() +
-            "-" +
-            Math.random()
+        crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random()
                 .toString(36)
-                .slice(2);
-
-    }
-
+                .slice(2)}`;
 
     return (
-        getLibraryPrefix() +
-        id +
-        "-" +
+        getLibraryPrefix()
+        +
+        id
+        +
+        "-"
+        +
         safeFileName(fileName)
     );
-
-}
-
-
-/* =========================================================
-   SUPABASE CHECK
-========================================================= */
-
-function requireSupabase() {
-
-    if (!supabaseClient) {
-
-        alert(
-            "BlueVault could not connect to Supabase.\n\n" +
-            "Please check your internet connection and Supabase setup."
-        );
-
-        return false;
-
-    }
-
-    return true;
 
 }
 
@@ -1229,7 +935,6 @@ async function handlePDFUpload(
 
     const file =
         event.target.files[0];
-
 
     if (!file) {
         return;
@@ -1293,15 +998,14 @@ async function handlePDFUpload(
     }
 
 
-    const uploadLabel =
+    const uploadBox =
         document.querySelector(
             "label[for='pdfInput']"
         );
 
+    if (uploadBox) {
 
-    if (uploadLabel) {
-
-        uploadLabel.classList.add(
+        uploadBox.classList.add(
             "uploading"
         );
 
@@ -1321,12 +1025,11 @@ async function handlePDFUpload(
             );
 
 
-        /* -------------------------------------------------
-           UPLOAD FILE
-        ------------------------------------------------- */
+        /* Upload actual PDF file */
 
         const storageResult =
-            await supabaseClient.storage
+            await supabaseClient
+                .storage
                 .from(
                     SUPABASE_BUCKET
                 )
@@ -1334,21 +1037,15 @@ async function handlePDFUpload(
                     filePath,
                     file,
                     {
-                        cacheControl:
-                            "3600",
-
+                        cacheControl: "3600",
                         contentType:
                             "application/pdf",
-
-                        upsert:
-                            false
+                        upsert: false
                     }
                 );
 
 
-        if (
-            storageResult.error
-        ) {
+        if (storageResult.error) {
 
             throw new Error(
                 storageResult.error.message
@@ -1357,55 +1054,37 @@ async function handlePDFUpload(
         }
 
 
-        /* -------------------------------------------------
-           SAVE DATABASE RECORD
-        ------------------------------------------------- */
+        /* Save PDF information */
 
-        const row = {
-
-            name:
-                file.name,
-
-            subject:
-                currentSubject,
-
-            chapter:
-                null,
-
-            file_path:
-                filePath,
-
-            file_size:
-                file.size
-
-        };
-
-
-        const dbResult =
+        const databaseResult =
             await supabaseClient
                 .from("pdfs")
-                .insert(row)
+                .insert({
+                    name: file.name,
+                    subject: currentSubject,
+                    chapter: null,
+                    file_path: filePath,
+                    file_size: file.size
+                })
                 .select()
                 .single();
 
 
-        if (
-            dbResult.error
-        ) {
+        if (databaseResult.error) {
 
-            /* Remove orphaned storage file */
+            /* Remove uploaded file if DB insert fails */
 
-            await supabaseClient.storage
+            await supabaseClient
+                .storage
                 .from(
                     SUPABASE_BUCKET
                 )
-                .remove(
-                    [filePath]
-                );
-
+                .remove([
+                    filePath
+                ]);
 
             throw new Error(
-                dbResult.error.message
+                databaseResult.error.message
             );
 
         }
@@ -1413,14 +1092,11 @@ async function handlePDFUpload(
 
         event.target.value = "";
 
-
         await renderPDFs();
-
 
         playSound(
             "upload"
         );
-
 
         showToast(
             "PDF uploaded successfully."
@@ -1434,7 +1110,6 @@ async function handlePDFUpload(
             error
         );
 
-
         alert(
             "PDF upload failed.\n\n" +
             explainSupabaseError(
@@ -1445,14 +1120,13 @@ async function handlePDFUpload(
 
     } finally {
 
-        if (uploadLabel) {
+        if (uploadBox) {
 
-            uploadLabel.classList.remove(
+            uploadBox.classList.remove(
                 "uploading"
             );
 
         }
-
 
         event.target.value = "";
 
@@ -1462,7 +1136,7 @@ async function handlePDFUpload(
 
 
 /* =========================================================
-   GET CURRENT PDFs
+   GET SHARED PDFs
 ========================================================= */
 
 async function getCurrentPDFs() {
@@ -1471,14 +1145,11 @@ async function getCurrentPDFs() {
         return [];
     }
 
-
     if (
         !currentSubject ||
         !currentLanguage
     ) {
-
         return [];
-
     }
 
 
@@ -1537,13 +1208,11 @@ async function getCurrentPDFs() {
             error
         );
 
-
         showPDFError(
             explainSupabaseError(
                 error
             )
         );
-
 
         return [];
 
@@ -1553,7 +1222,7 @@ async function getCurrentPDFs() {
 
 
 /* =========================================================
-   RENDER PDF LIBRARY
+   RENDER PDFs
 ========================================================= */
 
 async function renderPDFs() {
@@ -1563,12 +1232,10 @@ async function renderPDFs() {
             "pdfList"
         );
 
-
     const count =
         document.getElementById(
             "pdfCount"
         );
-
 
     if (!list) {
         return;
@@ -1577,23 +1244,23 @@ async function renderPDFs() {
 
     list.innerHTML = `
 
-        <div class="empty-state">
+<div class="empty-state">
 
-            <div class="empty-icon">
-                …
-            </div>
+    <div class="empty-icon">
+        …
+    </div>
 
-            <h3>
-                Loading shared notes
-            </h3>
+    <h3>
+        Loading shared notes
+    </h3>
 
-            <p>
-                Connecting to the BlueVault cloud library.
-            </p>
+    <p>
+        Connecting to the BlueVault cloud library.
+    </p>
 
-        </div>
+</div>
 
-    `;
+`;
 
 
     const all =
@@ -1631,51 +1298,46 @@ async function renderPDFs() {
 
     if (!filtered.length) {
 
-        if (all.length === 0) {
+        list.innerHTML =
+            all.length === 0
+                ? `
 
-            list.innerHTML = `
+<div class="empty-state">
 
-                <div class="empty-state">
+    <div class="empty-icon">
+        +
+    </div>
 
-                    <div class="empty-icon">
-                        +
-                    </div>
+    <h3>
+        No shared PDFs yet
+    </h3>
 
-                    <h3>
-                        No shared PDFs yet
-                    </h3>
+    <p>
+        Upload the first class note for this language.
+    </p>
 
-                    <p>
-                        Upload the first class note for this language.
-                    </p>
+</div>
 
-                </div>
+`
+                : `
 
-            `;
+<div class="empty-state">
 
-        } else {
+    <div class="empty-icon">
+        ⌕
+    </div>
 
-            list.innerHTML = `
+    <h3>
+        No matching PDFs
+    </h3>
 
-                <div class="empty-state">
+    <p>
+        Try another search.
+    </p>
 
-                    <div class="empty-icon">
-                        ⌕
-                    </div>
+</div>
 
-                    <h3>
-                        No matching PDFs
-                    </h3>
-
-                    <p>
-                        Try another search.
-                    </p>
-
-                </div>
-
-            `;
-
-        }
+`;
 
         return;
 
@@ -1689,64 +1351,62 @@ async function renderPDFs() {
 
                     return `
 
-                        <div class="pdf-item">
+<div class="pdf-item">
 
-                            <div class="pdf-icon">
-                                PDF
-                            </div>
-
-
-                            <div>
-
-                                <div
-                                    class="pdf-name"
-                                    title="${escapeHTML(pdf.name)}"
-                                >
-                                    ${escapeHTML(pdf.name)}
-                                </div>
+    <div class="pdf-icon">
+        PDF
+    </div>
 
 
-                                <div class="pdf-meta">
+    <div>
 
-                                    ${formatFileSize(
-                                        Number(
-                                            pdf.file_size
-                                        ) || 0
-                                    )}
-
-                                    •
-
-                                    ${formatDate(
-                                        pdf.uploaded_at
-                                    )}
-
-                                </div>
-
-                            </div>
+        <div
+            class="pdf-name"
+            title="${escapeHTML(pdf.name)}"
+        >
+            ${escapeHTML(pdf.name)}
+        </div>
 
 
-                            <div class="pdf-actions">
+        <div class="pdf-meta">
 
-                                <button
-                                    class="download-btn"
-                                    onclick="openSharedPDF('${escapeAttribute(pdf.id)}')"
-                                >
-                                    ↓ Open / Download
-                                </button>
+            ${formatFileSize(
+                Number(pdf.file_size) || 0
+            )}
+
+            •
+
+            ${formatDate(
+                pdf.uploaded_at
+            )}
+
+        </div>
+
+    </div>
 
 
-                                <button
-                                    class="delete-btn"
-                                    onclick="removePDF('${escapeAttribute(pdf.id)}')"
-                                >
-                                    × Remove
-                                </button>
+    <div class="pdf-actions">
 
-                            </div>
+        <button
+            class="download-btn"
+            onclick="openSharedPDF('${escapeAttribute(pdf.id)}')"
+        >
+            ↓ Open / Download
+        </button>
 
-                        </div>
 
-                    `;
+        <button
+            class="delete-btn"
+            onclick="removePDF('${escapeAttribute(pdf.id)}')"
+        >
+            × Remove
+        </button>
+
+    </div>
+
+</div>
+
+`;
 
                 }
             )
@@ -1756,7 +1416,7 @@ async function renderPDFs() {
 
 
 /* =========================================================
-   PDF SEARCH
+   SEARCH PDFs
 ========================================================= */
 
 function searchPDFs() {
@@ -1766,12 +1426,10 @@ function searchPDFs() {
             "pdfSearch"
         );
 
-
     searchTerm =
         input
             ? input.value.trim()
             : "";
-
 
     renderPDFs();
 
@@ -1806,9 +1464,7 @@ async function openSharedPDF(
                 .single();
 
 
-        if (
-            result.error
-        ) {
+        if (result.error) {
 
             throw new Error(
                 result.error.message
@@ -1818,7 +1474,8 @@ async function openSharedPDF(
 
 
         const signed =
-            await supabaseClient.storage
+            await supabaseClient
+                .storage
                 .from(
                     SUPABASE_BUCKET
                 )
@@ -1828,9 +1485,7 @@ async function openSharedPDF(
                 );
 
 
-        if (
-            signed.error
-        ) {
+        if (signed.error) {
 
             throw new Error(
                 signed.error.message
@@ -1844,29 +1499,22 @@ async function openSharedPDF(
                 "a"
             );
 
-
         link.href =
             signed.data.signedUrl;
-
 
         link.target =
             "_blank";
 
-
         link.rel =
             "noopener noreferrer";
-
 
         document.body.appendChild(
             link
         );
 
-
         link.click();
 
-
         link.remove();
-
 
         playSound(
             "download"
@@ -1879,7 +1527,6 @@ async function openSharedPDF(
             "Could not open PDF:",
             error
         );
-
 
         alert(
             "Could not open this PDF.\n\n" +
@@ -1894,7 +1541,7 @@ async function openSharedPDF(
 
 
 /* =========================================================
-   REMOVE PDF
+   REMOVE SHARED PDF
 ========================================================= */
 
 async function removePDF(
@@ -1921,9 +1568,7 @@ async function removePDF(
                 .single();
 
 
-        if (
-            result.error
-        ) {
+        if (result.error) {
 
             throw new Error(
                 result.error.message
@@ -1943,25 +1588,18 @@ async function removePDF(
         }
 
 
-        /* -------------------------------------------------
-           DELETE STORAGE OBJECT
-        ------------------------------------------------- */
-
         const storageResult =
-            await supabaseClient.storage
+            await supabaseClient
+                .storage
                 .from(
                     SUPABASE_BUCKET
                 )
-                .remove(
-                    [
-                        result.data.file_path
-                    ]
-                );
+                .remove([
+                    result.data.file_path
+                ]);
 
 
-        if (
-            storageResult.error
-        ) {
+        if (storageResult.error) {
 
             throw new Error(
                 storageResult.error.message
@@ -1969,10 +1607,6 @@ async function removePDF(
 
         }
 
-
-        /* -------------------------------------------------
-           DELETE DATABASE RECORD
-        ------------------------------------------------- */
 
         const deleteResult =
             await supabaseClient
@@ -1984,9 +1618,7 @@ async function removePDF(
                 );
 
 
-        if (
-            deleteResult.error
-        ) {
+        if (deleteResult.error) {
 
             throw new Error(
                 deleteResult.error.message
@@ -1997,11 +1629,9 @@ async function removePDF(
 
         await renderPDFs();
 
-
         playSound(
             "delete"
         );
-
 
         showToast(
             "PDF removed from the shared library."
@@ -2014,7 +1644,6 @@ async function removePDF(
             "Could not remove PDF:",
             error
         );
-
 
         alert(
             "Could not remove this PDF.\n\n" +
@@ -2039,7 +1668,6 @@ function openAddSubject() {
             "subjectModal"
         );
 
-
     if (!modal) {
         return;
     }
@@ -2057,7 +1685,6 @@ function openAddSubject() {
                 document.getElementById(
                     "subjectEnglish"
                 );
-
 
             if (input) {
                 input.focus();
@@ -2084,7 +1711,6 @@ function closeSubjectModal(
             "subjectModal"
         );
 
-
     if (!modal) {
         return;
     }
@@ -2094,9 +1720,7 @@ function closeSubjectModal(
         event &&
         event.target !== modal
     ) {
-
         return;
-
     }
 
 
@@ -2107,17 +1731,12 @@ function closeSubjectModal(
 }
 
 
-/* =========================================================
-   SUBJECT ICON
-========================================================= */
-
 function selectSubjectIcon(
     icon
 ) {
 
     selectedSubjectIcon =
         icon;
-
 
     playSound(
         "click"
@@ -2126,17 +1745,12 @@ function selectSubjectIcon(
 }
 
 
-/* =========================================================
-   ADD SUBJECT
-========================================================= */
-
 function addSubject() {
 
     const englishInput =
         document.getElementById(
             "subjectEnglish"
         );
-
 
     const bengaliInput =
         document.getElementById(
@@ -2184,8 +1798,10 @@ function addSubject() {
 
                 return (
                     subject.english
-                        .toLowerCase() ===
-                    english.toLowerCase()
+                        .toLowerCase()
+                    ===
+                    english
+                        .toLowerCase()
                 );
 
             }
@@ -2203,7 +1819,7 @@ function addSubject() {
     }
 
 
-    const cleanId =
+    const id =
         english
             .toLowerCase()
             .replace(
@@ -2211,27 +1827,22 @@ function addSubject() {
                 "-"
             )
             .replace(
-                /^-+|-+$/g,
+                /^-|-$/g,
                 ""
-            );
-
-
-    const id =
-        cleanId +
-        "-" +
-        Date.now();
+            )
+            +
+            "-"
+            +
+            Date.now();
 
 
     subjects.push({
 
-        id:
-            id,
+        id: id,
 
-        english:
-            english,
+        english: english,
 
-        bengali:
-            bengali,
+        bengali: bengali,
 
         short:
             "Custom study subject",
@@ -2256,7 +1867,6 @@ function addSubject() {
         englishInput.value = "";
     }
 
-
     if (bengaliInput) {
         bengaliInput.value = "";
     }
@@ -2264,14 +1874,11 @@ function addSubject() {
 
     closeSubjectModal();
 
-
     showSubjects();
-
 
     playSound(
         "success"
     );
-
 
     showToast(
         `${english} added to your library.`
@@ -2281,7 +1888,7 @@ function addSubject() {
 
 
 /* =========================================================
-   REMOVE CUSTOM SUBJECT
+   REMOVE SUBJECT
 ========================================================= */
 
 function removeSubject(
@@ -2291,12 +1898,7 @@ function removeSubject(
     const subject =
         subjects.find(
             function (item) {
-
-                return (
-                    item.id ===
-                    subjectId
-                );
-
+                return item.id === subjectId;
             }
         );
 
@@ -2331,12 +1933,7 @@ function removeSubject(
     subjects =
         subjects.filter(
             function (item) {
-
-                return (
-                    item.id !==
-                    subjectId
-                );
-
+                return item.id !== subjectId;
             }
         );
 
@@ -2347,11 +1944,9 @@ function removeSubject(
 
     updateSubjectCounters();
 
-
     playSound(
         "delete"
     );
-
 
     showToast(
         "Subject removed from this browser."
@@ -2371,21 +1966,19 @@ function toggleMobileMenu() {
             "mobileMenu"
         );
 
+    if (menu) {
 
-    if (!menu) {
-        return;
+        menu.classList.toggle(
+            "show"
+        );
+
     }
-
-
-    menu.classList.toggle(
-        "show"
-    );
 
 }
 
 
 /* =========================================================
-   SOUND SYSTEM
+   SOUND
 ========================================================= */
 
 function toggleSound() {
@@ -2421,10 +2014,6 @@ function toggleSound() {
 }
 
 
-/* =========================================================
-   AUDIO CONTEXT
-========================================================= */
-
 function getAudioContext() {
 
     if (!audioContext) {
@@ -2437,15 +2026,10 @@ function getAudioContext() {
 
     }
 
-
     return audioContext;
 
 }
 
-
-/* =========================================================
-   BEEP
-========================================================= */
 
 function beep(
     frequency,
@@ -2490,7 +2074,7 @@ function beep(
         gain.gain.exponentialRampToValueAtTime(
             0.001,
             ctx.currentTime +
-                duration
+            duration
         );
 
 
@@ -2498,14 +2082,12 @@ function beep(
             gain
         );
 
-
         gain.connect(
             ctx.destination
         );
 
 
         oscillator.start();
-
 
         oscillator.stop(
             ctx.currentTime +
@@ -2523,10 +2105,6 @@ function beep(
 
 }
 
-
-/* =========================================================
-   SOUND TYPES
-========================================================= */
 
 function playSound(
     type
@@ -2584,7 +2162,6 @@ function playSound(
                 0.022
             );
 
-
             setTimeout(
                 function () {
 
@@ -2610,7 +2187,6 @@ function playSound(
                 "triangle",
                 0.022
             );
-
 
             setTimeout(
                 function () {
@@ -2638,7 +2214,6 @@ function playSound(
                 0.03
             );
 
-
             setTimeout(
                 function () {
 
@@ -2664,7 +2239,6 @@ function playSound(
                 "sine",
                 0.025
             );
-
 
             setTimeout(
                 function () {
@@ -2716,7 +2290,6 @@ function playSound(
                 0.035
             );
 
-
             setTimeout(
                 function () {
 
@@ -2741,8 +2314,6 @@ function playSound(
                 0.06
             );
 
-            break;
-
     }
 
 }
@@ -2761,7 +2332,6 @@ function showToast(
             "toast"
         );
 
-
     const messageElement =
         document.getElementById(
             "toastMessage"
@@ -2772,9 +2342,7 @@ function showToast(
         !toast ||
         !messageElement
     ) {
-
         return;
-
     }
 
 
@@ -2808,74 +2376,7 @@ function showToast(
 
 
 /* =========================================================
-   SUPABASE ERROR HANDLING
-========================================================= */
-
-function explainSupabaseError(
-    error
-) {
-
-    const message =
-        String(
-            error &&
-            error.message
-                ? error.message
-                : error ||
-                  "Unknown error"
-        );
-
-
-    if (
-        /row-level security|
-        permission denied|
-        not authorized/i.test(
-            message
-        )
-    ) {
-
-        return (
-            "Supabase security policies are blocking this action. " +
-            "Check the BlueVault database and Storage policies."
-        );
-
-    }
-
-
-    if (
-        /bucket|object/i.test(
-            message
-        )
-    ) {
-
-        return (
-            "Check that the Storage bucket is named exactly " +
-            "bluevault-pdfs."
-        );
-
-    }
-
-
-    if (
-        /network|fetch|failed to fetch/i.test(
-            message
-        )
-    ) {
-
-        return (
-            "Check your internet connection and make sure " +
-            "the Supabase project is online."
-        );
-
-    }
-
-
-    return message;
-
-}
-
-
-/* =========================================================
-   PDF ERROR
+   ERROR HANDLING
 ========================================================= */
 
 function showPDFError(
@@ -2895,29 +2396,86 @@ function showPDFError(
 
     list.innerHTML = `
 
-        <div class="empty-state">
+<div class="empty-state">
 
-            <div class="empty-icon">
-                !
-            </div>
+    <div class="empty-icon">
+        !
+    </div>
 
-            <h3>
-                Cloud library unavailable
-            </h3>
+    <h3>
+        Cloud library unavailable
+    </h3>
 
-            <p>
-                ${escapeHTML(message)}
-            </p>
+    <p>
+        ${escapeHTML(message)}
+    </p>
 
-        </div>
+</div>
 
-    `;
+`;
+
+}
+
+
+function explainSupabaseError(
+    error
+) {
+
+    const message =
+        String(
+            error &&
+            error.message
+                ? error.message
+                : error ||
+                  "Unknown error"
+        );
+
+
+    if (
+        /row-level security|permission denied|not authorized/i
+            .test(message)
+    ) {
+
+        return (
+            "Supabase security policies are blocking this action. " +
+            "We need to add the BlueVault database and Storage policies."
+        );
+
+    }
+
+
+    if (
+        /bucket|object/i.test(
+            message
+        )
+    ) {
+
+        return (
+            "Check that the Storage bucket is named exactly bluevault-pdfs."
+        );
+
+    }
+
+
+    if (
+        /network|fetch|failed to fetch/i
+            .test(message)
+    ) {
+
+        return (
+            "Check your internet connection and make sure the Supabase project is online."
+        );
+
+    }
+
+
+    return message;
 
 }
 
 
 /* =========================================================
-   FILE SIZE
+   FILE HELPERS
 ========================================================= */
 
 function formatFileSize(
@@ -2961,26 +2519,22 @@ function formatFileSize(
                     index
                 )
             ) * 100
-        ) / 100 +
-        " " +
+        ) / 100
+        +
+        " "
+        +
         units[index]
     );
 
 }
 
 
-/* =========================================================
-   DATE FORMAT
-========================================================= */
-
 function formatDate(
     dateString
 ) {
 
     if (!dateString) {
-
         return "Unknown date";
-
     }
 
 
@@ -3004,14 +2558,9 @@ function formatDate(
     return date.toLocaleDateString(
         undefined,
         {
-            day:
-                "2-digit",
-
-            month:
-                "short",
-
-            year:
-                "numeric"
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
         }
     );
 
@@ -3019,16 +2568,14 @@ function formatDate(
 
 
 /* =========================================================
-   HTML ESCAPING
+   ESCAPING
 ========================================================= */
 
 function escapeHTML(
     value
 ) {
 
-    return String(
-        value
-    )
+    return String(value)
         .replace(
             /&/g,
             "&amp;"
@@ -3053,17 +2600,11 @@ function escapeHTML(
 }
 
 
-/* =========================================================
-   ATTRIBUTE ESCAPING
-========================================================= */
-
 function escapeAttribute(
     value
 ) {
 
-    return String(
-        value
-    )
+    return String(value)
         .replace(
             /\\/g,
             "\\\\"
@@ -3098,11 +2639,6 @@ function setupKeyboardShortcuts() {
         "keydown",
         function (event) {
 
-
-            /* ---------------------------------------------
-               ESCAPE
-            --------------------------------------------- */
-
             if (
                 event.key ===
                 "Escape"
@@ -3113,17 +2649,15 @@ function setupKeyboardShortcuts() {
             }
 
 
-            /* ---------------------------------------------
-               CTRL + K / CMD + K
-            --------------------------------------------- */
-
             if (
                 (
                     event.ctrlKey ||
                     event.metaKey
-                ) &&
-                event.key.toLowerCase() ===
-                    "k"
+                )
+                &&
+                event.key.toLowerCase()
+                ===
+                "k"
             ) {
 
                 event.preventDefault();
@@ -3165,8 +2699,6 @@ function setupKeyboardShortcuts() {
                     }
 
                 }
-
-
                 else if (
                     pdfPage &&
                     pdfPage.classList.contains(
@@ -3177,61 +2709,6 @@ function setupKeyboardShortcuts() {
                     if (pdfSearch) {
                         pdfSearch.focus();
                     }
-
-                }
-
-            }
-
-
-            /* ---------------------------------------------
-               ESC / BACKSPACE MOBILE NAVIGATION
-            --------------------------------------------- */
-
-            if (
-                event.key ===
-                "Backspace"
-            ) {
-
-                const target =
-                    event.target;
-
-
-                const isTyping =
-                    target &&
-                    (
-                        target.tagName ===
-                            "INPUT" ||
-                        target.tagName ===
-                            "TEXTAREA" ||
-                        target.isContentEditable
-                    );
-
-
-                /*
-                   Do NOT hijack Backspace while
-                   the user is typing.
-                */
-
-                if (isTyping) {
-                    return;
-                }
-
-
-                const activePage =
-                    document.querySelector(
-                        ".page.active"
-                    );
-
-
-                if (
-                    activePage &&
-                    activePage.id !==
-                        "homePage"
-                ) {
-
-                    event.preventDefault();
-
-                    mobileGoBack();
 
                 }
 
@@ -3265,13 +2742,12 @@ function setupKeyboardShortcuts() {
 
     let mouseY = 0;
 
-    let animationFrame = null;
+    let raf = null;
 
 
     function updateHero() {
 
-        animationFrame =
-            null;
+        raf = null;
 
 
         const hero =
@@ -3325,19 +2801,19 @@ function setupKeyboardShortcuts() {
 
             mouseX =
                 event.clientX /
-                    window.innerWidth -
+                window.innerWidth -
                 0.5;
 
 
             mouseY =
                 event.clientY /
-                    window.innerHeight -
+                window.innerHeight -
                 0.5;
 
 
-            if (!animationFrame) {
+            if (!raf) {
 
-                animationFrame =
+                raf =
                     requestAnimationFrame(
                         updateHero
                     );
@@ -3357,9 +2833,9 @@ function setupKeyboardShortcuts() {
             mouseY = 0;
 
 
-            if (!animationFrame) {
+            if (!raf) {
 
-                animationFrame =
+                raf =
                     requestAnimationFrame(
                         updateHero
                     );
@@ -3369,20 +2845,4 @@ function setupKeyboardShortcuts() {
         }
     );
 
-})();
-
-
-/* =========================================================
-   INITIAL BACK BUTTON STATE
-========================================================= */
-
-window.addEventListener(
-    "load",
-    function () {
-
-        updateMobileBackButton(
-            "homePage"
-        );
-
-    }
-);
+})();   

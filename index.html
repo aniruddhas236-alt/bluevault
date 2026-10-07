@@ -8,7 +8,7 @@
 
     <meta
         name="description"
-        content="BlueVault — shared digital class notes and educational PDF library."
+        content="Premium digital study library for books, notes and educational PDFs."
     >
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,9 +39,11 @@
         </div>
 
         <div class="book-pages">
+
             <div class="page-layer page-1"></div>
             <div class="page-layer page-2"></div>
             <div class="page-layer page-3"></div>
+
         </div>
 
         <div class="book-cover book-right">
@@ -172,7 +174,7 @@
 
 
 <!-- =====================================================
-     HOME PAGE
+     HOME
 ===================================================== -->
 
 <section
@@ -233,7 +235,7 @@
                 <div class="stat">
 
                     <strong id="homeSubjectCount">
-                        12
+                        10+
                     </strong>
 
                     <span>
@@ -383,11 +385,9 @@
 
 
         <div class="big-number">
-
             <span id="subjectNumber">
-                12
+                10
             </span>
-
         </div>
 
     </div>
@@ -578,7 +578,7 @@
         <div>
 
             <span class="section-label">
-                SHARED DIGITAL ARCHIVE
+                DIGITAL ARCHIVE
             </span>
 
             <h1 id="pdfPageTitle">
@@ -586,7 +586,7 @@
             </h1>
 
             <p id="pdfPageDescription">
-                Your shared class notes.
+                Your study resources.
             </p>
 
         </div>
@@ -627,7 +627,7 @@
     </div>
 
 
-    <!-- PDF UPLOAD -->
+    <!-- UPLOAD -->
 
     <div class="upload-section">
 
@@ -655,7 +655,7 @@
                 </strong>
 
                 <p>
-                    Upload a class note to the shared library
+                    Click to upload a document to this library
                 </p>
 
             </div>
@@ -677,6 +677,22 @@
 </section>
 
 </main>
+
+
+<!-- =====================================================
+     MOBILE BACK BUTTON
+===================================================== -->
+
+<button
+    id="mobileBackButton"
+    class="mobile-back-button"
+    type="button"
+    onclick="mobileGoBack()"
+    aria-label="Go back"
+>
+    <span class="mobile-back-arrow">←</span>
+    <span>Back</span>
+</button>
 
 
 <!-- =====================================================
@@ -867,14 +883,7 @@
 </footer>
 
 
-<!-- =====================================================
-     SUPABASE
-===================================================== -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- BLUEVAULT JAVASCRIPT -->
-
 <script src="script.js"></script>
 
 </body>
